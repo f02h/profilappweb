@@ -37,6 +37,7 @@ def do_upload():
     c = conn.cursor()
     c.execute("INSERT INTO job (length, qty,idProfile,loader, qtyD, done) VALUES (?,?,?,?,?,?)",
               (1000, 1, 0, 0, 0,0))
+    conn.commit()
 
     data = request.files.upload
     if data and data.file:
