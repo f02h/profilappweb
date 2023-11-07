@@ -33,6 +33,11 @@ def nested_dict(n, type):
 
 @route('/upload', method=['GET', 'POST'])
 def do_upload():
+    conn = sqlite3.connect('/home/pi/profilapp/todo.db')
+    c = conn.cursor()
+    c.execute("INSERT INTO job (length, qty,idProfile,loader, qtyD, done) VALUES (?,?,?,?,?,?)",
+              (1000, 1, 0, 0, 0,0))
+
     data = request.files.upload
     if data and data.file:
 
