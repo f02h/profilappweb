@@ -83,8 +83,19 @@ def do_upload():
                         if "profil" not in str(part):
                             c.execute("INSERT INTO vrtalka (name,qty,dimensions,status,project) VALUES (?,?,?,?,?)",
                                       (part, qty * iQty, float(round(float(row[2]), 2)), 1, name))
+                            tmpWidth = int(round(float(row[4]), 2))
+                            res = c.execute("SELECT id,name,loader FROM profili WHERE dimension LIKE ?",
+                                            (tmpWidth,)).fetchone()
+                            idProfil = int(res[0])
+                            loadingBay = int(res[2])
+                            if not idProfil:
+                                idProfil = 1
+                                loadingBay = 0
 
-                        c.execute("INSERT INTO zaga (name,qty,dimensions,status,project) VALUES (?,?,?,?,?)", (part,qty * iQty,float(round(float(row[2]), 2)), 1, name))
+                            c.execute("INSERT INTO job (length, qty,idProfile,loader, qtyD, done) VALUES (?,?,?,?,?,?)",
+                                      (float(round(float(row[3]), 2)), qty * iQty, idProfil, loadingBay, 0, 0))
+
+                        #c.execute("INSERT INTO zaga (name,qty,dimensions,status,project) VALUES (?,?,?,?,?)", (part,qty * iQty,float(round(float(row[2]), 2)), 1, name))
                         conn.commit()
                     line_count += 1
         c.close()
