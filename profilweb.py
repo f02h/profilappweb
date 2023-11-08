@@ -35,9 +35,9 @@ def nested_dict(n, type):
 def do_upload():
     conn = sqlite3.connect('/home/pi/profilapp/todo.db')
     c = conn.cursor()
-    c.execute("INSERT INTO job (length, qty,idProfile,loader, qtyD, done) VALUES (?,?,?,?,?,?)",
-              (1000, 1, 0, 0, 0,0))
-    conn.commit()
+
+    #c.execute("INSERT INTO job (length, qty,idProfile,loader, qtyD, done) VALUES (?,?,?,?,?,?)",(1000, 1, 0, 0, 0,0))
+    #conn.commit()
 
     data = request.files.upload
     if data and data.file:
@@ -61,6 +61,34 @@ def do_upload():
         conn = sqlite3.connect('/home/pi/profilapp/todo.db')
         c = conn.cursor()
 
+        plankWidth = False
+        with open(file_path, newline='', encoding='cp1252') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            line_count = 0
+            for row in csv_reader:
+                if line_count == 0:
+                    line_count += 1
+                else:
+                    part = row[0].encode().decode("utf-8")
+                    qty = re.search("[0-9]+x", str(part))
+                    try:
+                        if qty.group(0):
+                            part = part.lstrip(qty.group(0))
+                            qty = qty.group(0).rstrip("x")
+                        else:
+                            qty = 0
+                    except:
+                        qty = 0
+
+                    if qty:
+                        if "profil" in str(part) and not plankWidth:
+                            if float(round(float(row[4]), 2)) == 12.50:
+                                plankWidth = 9.5
+                            else:
+                                plankWidth = 7
+
+                    line_count += 1
+
         with open(file_path, newline='', encoding='cp1252') as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             line_count = 0
@@ -81,11 +109,16 @@ def do_upload():
 
                     if qty:
                         if "profil" not in str(part):
-                            c.execute("INSERT INTO vrtalka (name,qty,dimensions,status,project) VALUES (?,?,?,?,?)",
-                                      (part, qty * iQty, float(round(float(row[2]), 2)), 1, name))
+
+                            #
+                            # dimension should be 30/30/7 or 22/22/7 for casemaker otherwise just 30/30
+                            #
                             tmpWidth = int(round(float(row[4]), 2))
-                            res = c.execute("SELECT id,name,loader FROM profili WHERE dimension LIKE ?",
-                                            (tmpWidth,)).fetchone()
+                            if "kotnik" in str(part):
+                                res = c.execute("SELECT id,name,loader FROM profili WHERE dimension LIKE ?",( str(tmpWidth)+"/"+str(tmpWidth),)).fetchone()
+                            elif "kotnik" not in str(part):
+                                res = c.execute("SELECT id,name,loader FROM profili WHERE dimension LIKE ?",(str(tmpWidth)+"/"+str(tmpWidth)+"/"+str(plankWidth),)).fetchone()
+
                             idProfil = int(res[0])
                             loadingBay = int(res[2])
                             if not idProfil:
