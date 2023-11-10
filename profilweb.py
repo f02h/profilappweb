@@ -126,7 +126,7 @@ def do_upload():
                                 loadingBay = 0
 
                             c.execute("INSERT INTO job (length, qty,idProfile,loader, qtyD, done) VALUES (?,?,?,?,?,?)",
-                                      (float(round(float(row[3]), 2)), qty * iQty, idProfil, loadingBay, 0, 0))
+                                      (float(round(float(row[2]), 2)), qty * iQty, idProfil, loadingBay, 0, 0))
 
                         #c.execute("INSERT INTO zaga (name,qty,dimensions,status,project) VALUES (?,?,?,?,?)", (part,qty * iQty,float(round(float(row[2]), 2)), 1, name))
                         conn.commit()
