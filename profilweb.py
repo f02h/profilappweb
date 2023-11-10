@@ -108,7 +108,7 @@ def do_upload():
                         qty = 0
 
                     if qty:
-                        if "profil" not in str(part):
+                        if "profil" not in str(part) and ("kotnik" in str(part) or "casemaker" in str(part)):
 
                             #
                             # dimension should be 30/30/7 or 22/22/7 for casemaker otherwise just 30/30
@@ -116,7 +116,7 @@ def do_upload():
                             tmpWidth = int(round(float(row[4]), 2))
                             if "kotnik" in str(part):
                                 res = c.execute("SELECT id,name,loader FROM profili WHERE dimension LIKE ?",( str(tmpWidth)+"/"+str(tmpWidth),)).fetchone()
-                            elif "kotnik" not in str(part):
+                            elif "casemaker" in str(part):
                                 res = c.execute("SELECT id,name,loader FROM profili WHERE dimension LIKE ?",(str(tmpWidth)+"/"+str(tmpWidth)+"/"+str(plankWidth),)).fetchone()
 
                             idProfil = int(res[0])
